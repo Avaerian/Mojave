@@ -8,7 +8,7 @@ public abstract class EngineService {
 
     protected void markServiceAsDisabled(String error) {
         this.isEnabled = false;
-        System.err.println(error != null ? error : "Service is unavailable");
+        throw new IllegalStateException(error != null ? error : "Service is unavailable");
     }
 
     protected void markServiceAsEnabled() {

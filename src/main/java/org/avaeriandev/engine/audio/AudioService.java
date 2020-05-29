@@ -72,10 +72,10 @@ public class AudioService extends EngineService {
         markServiceAsEnabled();
     }
 
-    // TODO Temporary?
     public void start() {
         AL11.alListener3f(AL11.AL_POSITION, 0, 0, 0);
         AL11.alListener3f(AL11.AL_VELOCITY, 0, 0, 0);
+        AL11.alListeneri(AL11.AL_GAIN, 1);
     }
 
     public int loadSound(String file) throws IOException, UnsupportedAudioFileException {
@@ -85,28 +85,23 @@ public class AudioService extends EngineService {
         AudioInputStream soundStream = AudioSystem.getAudioInputStream(soundFile);
         AudioFormat soundData = soundStream.getFormat();
 
-        // TODO Debug; sound isn't playing
-
         // Create buffer
         byte[] soundByteArray = new byte[soundStream.available()];
         soundStream.read(soundByteArray);
         ByteBuffer soundBuffer = BufferUtils.createByteBuffer(soundByteArray.length).put(soundByteArray);
+        soundBuffer.rewind();
 
         // Prepare for OpenAL
         int buffer = AL11.alGenBuffers();
         buffers.add(buffer);
-        System.out.println(getFormat(soundData));
         AL11.alBufferData(buffer, getFormat(soundData), soundBuffer, (int) soundData.getSampleRate());
 
         // Finish
         soundStream.close();
         soundBuffer.flip();
-
-        System.out.println(buffer);
         return buffer;
     }
 
-    // TODO
     private int getFormat(AudioFormat soundData) {
         if(soundData.getChannels() == 1) {
             return soundData.getSampleSizeInBits() == 8 ? AL11.AL_FORMAT_MONO8 : AL11.AL_FORMAT_MONO16;

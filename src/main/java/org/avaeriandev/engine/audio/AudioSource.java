@@ -35,7 +35,7 @@ public class AudioSource {
     }
 
     public boolean isPlaying() {
-        return AL11.alGetSourcei(sourceId, AL11.AL_PLAYING) == AL11.AL_TRUE;
+        return AL11.alGetSourcei(sourceId, AL11.AL_SOURCE_STATE) == AL11.AL_PLAYING;
     }
 
 }
