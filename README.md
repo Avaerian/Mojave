@@ -1,3 +1,5 @@
+*placeholder readme for now; needs to be updated*
+
 # Mojave
 Welcome to Mojave, the open-source game engine written in Java!
 Mojave is written with developer extensions in-mind, offering a nifty API for quickly creating a game or application.
