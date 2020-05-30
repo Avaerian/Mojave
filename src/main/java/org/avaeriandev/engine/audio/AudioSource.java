@@ -22,7 +22,7 @@ public class AudioSource {
         AL11.alSourceStop(sourceId);
     }
 
-    public void loop(boolean enable) {
+    public void setLooping(boolean enable) {
         AL11.alSourcei(sourceId, AL11.AL_LOOPING, enable ? AL11.AL_TRUE : AL11.AL_FALSE);
     }
 

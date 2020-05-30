@@ -1,20 +1,19 @@
 package org.avaeriandev.engine.audio;
 
-import com.sun.media.sound.WaveFileReader;
 import org.avaeriandev.engine.EngineService;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.openal.*;
-import org.lwjgl.stb.STBVorbis;
-import org.lwjgl.stb.STBVorbisInfo;
 import org.lwjgl.system.MemoryUtil;
 
-import javax.sound.sampled.*;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class AudioService extends EngineService {
@@ -78,28 +77,32 @@ public class AudioService extends EngineService {
         AL11.alListeneri(AL11.AL_GAIN, 1);
     }
 
-    public int loadSound(String file) throws IOException, UnsupportedAudioFileException {
+    public int loadSound(String filepath) {
+        try {
+            // Get sound data from file
+            File soundFile = new File(filepath);
+            AudioInputStream soundStream = AudioSystem.getAudioInputStream(soundFile);
+            AudioFormat soundData = soundStream.getFormat();
 
-        // Get file and high-level data
-        File soundFile = new File(file);
-        AudioInputStream soundStream = AudioSystem.getAudioInputStream(soundFile);
-        AudioFormat soundData = soundStream.getFormat();
+            // Create buffer
+            byte[] soundByteArray = new byte[soundStream.available()];
+            soundStream.read(soundByteArray);
+            ByteBuffer soundBuffer = BufferUtils.createByteBuffer(soundByteArray.length).put(soundByteArray);
+            soundBuffer.rewind();
 
-        // Create buffer
-        byte[] soundByteArray = new byte[soundStream.available()];
-        soundStream.read(soundByteArray);
-        ByteBuffer soundBuffer = BufferUtils.createByteBuffer(soundByteArray.length).put(soundByteArray);
-        soundBuffer.rewind();
+            // Send data to OpenAL
+            int buffer = AL11.alGenBuffers();
+            buffers.add(buffer);
+            AL11.alBufferData(buffer, getFormat(soundData), soundBuffer, (int) soundData.getSampleRate());
 
-        // Prepare for OpenAL
-        int buffer = AL11.alGenBuffers();
-        buffers.add(buffer);
-        AL11.alBufferData(buffer, getFormat(soundData), soundBuffer, (int) soundData.getSampleRate());
-
-        // Finish
-        soundStream.close();
-        soundBuffer.flip();
-        return buffer;
+            // Finish
+            soundStream.close();
+            soundBuffer.flip();
+            return buffer;
+        } catch (UnsupportedAudioFileException | IOException e) {
+            System.err.println(filepath + " failed to load.");
+            return -1;
+        }
     }
 
     private int getFormat(AudioFormat soundData) {
