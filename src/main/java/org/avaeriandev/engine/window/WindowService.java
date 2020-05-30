@@ -2,28 +2,25 @@ package org.avaeriandev.engine.window;
 
 import org.avaeriandev.engine.Engine;
 import org.avaeriandev.engine.EngineService;
-import org.avaeriandev.engine.audio.AudioSource;
 import org.avaeriandev.engine.event.EventManager;
 import org.avaeriandev.engine.event.events.KeyPressEvent;
 import org.avaeriandev.engine.event.events.KeyReleaseEvent;
 import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
-import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryUtil;
-
-import javax.sound.sampled.UnsupportedAudioFileException;
-import java.io.IOException;
 
 public class WindowService extends EngineService {
 
     private long window;
     private Engine engine;
+    private boolean isActive;
 
     private WindowService(Engine engine) {
         init();
         this.engine = engine;
+        isActive = false;
     }
     private static WindowService instance = null;
     public static WindowService getService(Engine engine) {
@@ -73,51 +70,36 @@ public class WindowService extends EngineService {
 
     public void start() {
         GLFW.glfwShowWindow(window);
-
-        // TODO: Get OpenGL ready
-        GL.createCapabilities();
-        GL11.glClearColor(1,0,0,0);
-
-        int buffer;
-        try {
-            buffer = engine.getAudio().loadSound("C:/Users/rblxa/Desktop/Easy Lemon.wav");
-        } catch (IOException | UnsupportedAudioFileException e) {
-            e.printStackTrace();
-            return;
-        }
-
-        AudioSource source = new AudioSource(1, 1);
-        source.play(buffer);
-
-        while(isRunning()) {
-
-            engine.logicLoop();
-            if(source.isPlaying()) {
-                System.out.println("Sound is being played!");
-            }
-
-            GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-            GLFW.glfwSwapBuffers(window);
-            GLFW.glfwWaitEvents();
-        }
-
-        destroy();
+        isActive = true;
     }
 
     public boolean isRunning() {
-        return !GLFW.glfwWindowShouldClose(window);
+        return !GLFW.glfwWindowShouldClose(window) && isActive;
     }
 
-    public void close() {
+    @Override
+    public void stop() {
+        System.out.println("Window has been requested to stop.");
         GLFW.glfwSetWindowShouldClose(window, true);
+        isActive = false;
+        destroy();
+    }
+
+    // TODO: temporary function
+    public void render() {
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+        GLFW.glfwSwapBuffers(window);
+        GLFW.glfwWaitEvents();
     }
 
     private void destroy() {
 
+        System.out.println("Window has been requested to be destroyed.");
         Callbacks.glfwFreeCallbacks(window);
         GLFW.glfwDestroyWindow(window);
         GLFW.glfwTerminate();
         GLFW.glfwSetErrorCallback(null).free();
+        System.out.println("Window has been destroyed.");
 
     }
 }

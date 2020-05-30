@@ -19,13 +19,13 @@ public class TestEngine extends Engine {
         return instance;
     }
 
-    public void prepareWindow() {
+    public void createWindow() {
         WindowService window = super.getWindow();
         if(window == null) throw new IllegalStateException("Window service is unavailable");
 
         // Configure
         window.setFlag(GLFW.GLFW_VISIBLE, false);
-        window.setFlag(GLFW.GLFW_RESIZABLE, false);
+        window.setFlag(GLFW.GLFW_RESIZABLE, true);
 
         // Register Events
         EventManager.registerEvent(KeyPressEvent.class);
@@ -34,27 +34,20 @@ public class TestEngine extends Engine {
         EventManager.registerListener(KeyReleaseEvent.class, new KeyReleaseListener());
 
         // Create window
-        window.create(1270, 720, "Lumbern Game Engine");
+        window.create(1270, 720, "Mojave Game Engine");
     }
 
     @Override
-    public void logicLoop() {
-
-        if(!Input.getHeldKeys().isEmpty()) {
-            System.out.println(Input.getHeldKeys());
-        }
-    }
-
-    @Override
-    public void start() {
-
+    public void onStart() {
         getAudio().start();
+        getRenderer().start();
         getWindow().start();
     }
 
     @Override
-    public void stop() {
-        getWindow().close();
+    public void onTerminate() {
         getAudio().stop();
+        getRenderer().stop();
+        getWindow().stop();
     }
 }

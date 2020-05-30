@@ -18,7 +18,7 @@ public class KeyPressListener implements EngineListener {
         Input.addKey(e.getKey());
 
         if(e.getKey() == GLFW.GLFW_KEY_ESCAPE) {
-            TestApplication.getEngine().stop();
+            TestApplication.getEngine().terminate();
         }
     }
 }

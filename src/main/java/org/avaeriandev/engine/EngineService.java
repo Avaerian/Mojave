@@ -18,4 +18,7 @@ public abstract class EngineService {
     public boolean isEnabled() {
         return isEnabled;
     }
+
+    public abstract void start();
+    public abstract void stop();
 }
