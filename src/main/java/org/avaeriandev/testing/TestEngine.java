@@ -26,6 +26,7 @@ public class TestEngine extends Engine {
         // Configure
         window.setFlag(GLFW.GLFW_VISIBLE, false);
         window.setFlag(GLFW.GLFW_RESIZABLE, true);
+        window.setFlag(GLFW.GLFW_FOCUSED, true);
 
         // Register Events
         EventManager.registerEvent(KeyPressEvent.class);
